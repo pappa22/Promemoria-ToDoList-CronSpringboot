@@ -36,17 +36,10 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-
-        String loginPage = "/login";
-        String logoutPage = "/logout";
-
-        
+   
         http
         .authorizeRequests()
-        .antMatchers(
-            "/registration**",
-            "/webjars/**",
-            "/css/**").permitAll()
+        .antMatchers("/registration").permitAll()
         .antMatchers("/user/**").hasAuthority("USER")
         .anyRequest().authenticated()
         .and()
@@ -54,13 +47,14 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         .loginPage("/login")
         .defaultSuccessUrl("/user/home")
         .usernameParameter("email")
+        .passwordParameter("password")
         .permitAll()
         .and()
         .logout()
         .invalidateHttpSession(true)
         .clearAuthentication(true)
         .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-        .logoutSuccessUrl("/login?logout")
+        .logoutSuccessUrl("/login")
         .permitAll();
 
 
