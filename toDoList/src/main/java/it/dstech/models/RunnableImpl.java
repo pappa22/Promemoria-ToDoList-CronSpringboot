@@ -20,7 +20,7 @@ public class RunnableImpl implements Runnable {
 		
 		User currUser = activity.getUser();
 		try {
-			mail.sendMail(currUser.getEmail(), "Reminder " + activity.getActivityTitle(), "This activity will expired in 30 minutes.");
+			mail.inviaMail(currUser.getEmail(), "L'attività " + activity.getActivityTitle(), "inizierà tra 5 minuti.");
 		} catch (MessagingException e) {
 			e.printStackTrace();
 		}

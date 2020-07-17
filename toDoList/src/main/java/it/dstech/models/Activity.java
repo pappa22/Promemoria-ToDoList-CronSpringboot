@@ -13,6 +13,8 @@ import javax.persistence.ManyToOne;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 @Entity
 public class Activity {
 	@Id
@@ -28,7 +30,8 @@ public class Activity {
 	
 	private String date;
 //inserire TimeZone per un corretto invio del promemoria
-	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone="Europe/Rome")
+	@DateTimeFormat(iso = DateTimeFormat.ISO.TIME)
 	private LocalDateTime expiredDate;
 
 	private boolean isCarryOut;

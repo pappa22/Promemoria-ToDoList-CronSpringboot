@@ -23,8 +23,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
-
 @Data
 @Builder
 @AllArgsConstructor
@@ -35,7 +33,7 @@ public class User {
 	
 	@Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer id;
+    private Long id;
 
     @Length(min = 5, message = "*Your user name must have at least 5 characters")
     @NotEmpty(message = "*Please provide a user name")
@@ -60,11 +58,11 @@ public class User {
 	  @JoinTable(name = "users_activities")
 	    private List<Activity> activities;
 
-	public Integer getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
