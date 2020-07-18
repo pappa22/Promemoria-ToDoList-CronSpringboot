@@ -35,9 +35,6 @@ public class User {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Length(min = 5, message = "*Your user name must have at least 5 characters")
-    @NotEmpty(message = "*Please provide a user name")
-    private String username;
 	
     @Email(message = "*Please provide a valid Email")
     @NotEmpty(message = "*Please provide an email")
@@ -66,13 +63,6 @@ public class User {
 		this.id = id;
 	}
 
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
 
 	public String getEmail() {
 		return email;

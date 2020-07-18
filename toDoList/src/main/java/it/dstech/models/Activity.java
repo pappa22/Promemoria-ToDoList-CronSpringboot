@@ -10,16 +10,27 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
+@Table(name = "activity")
 public class Activity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name = "activity_id")
+	@Column(name = "id")
 	private Long id;
 
 	private String activityTitle;

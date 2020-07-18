@@ -52,7 +52,7 @@ public class AppController {
 	@Autowired
 	private MailService mailService;
 
-	@RequestMapping(value = { "/login", "/" }, method = RequestMethod.GET)
+	@GetMapping(value = { "/login", "/" })
 	public ModelAndView login() {
 		ModelAndView model = new ModelAndView();
 		model.setViewName("login");
@@ -68,13 +68,21 @@ public class AppController {
 //	    public String showRegistrationForm(Model model) {
 //	        return "registration";
 //	    }
+	    @GetMapping(value="/registrati")
+	    public ModelAndView registration(){
+	        ModelAndView modelAndView = new ModelAndView();
+	        User user = new User();
+	        modelAndView.addObject("user", user);
+	        modelAndView.setViewName("registration");
+	        return modelAndView;
+	    }
 
-	 	@GetMapping(value="/registration")
+	 	@PostMapping(value="/registration")
 	    public ModelAndView registerUserAccount(@ModelAttribute("user") @Valid UserRegistrationDao userDao, BindingResult result) throws MessagingException, IOException {
 	 		ModelAndView model = new ModelAndView();
 	 		User userEsistente = userService.findByEmail(userDao.getEmail());
 	        if (userEsistente != null) {
-	            result.rejectValue("email", null, "There is already an account registered with that email");
+	            result.rejectValue("email", null, "Utente già presente con questa email");
 	        }
 
 	        if (result.hasErrors()) {
@@ -83,9 +91,9 @@ public class AppController {
 	        }
 
 	        userService.save(userDao);
-	        mailService.inviaMail(userDao.getEmail(), "Confirm registration", "User has been registered successfully");
-	        model.addObject("successMessage", "User has been registered successfully, go back to login page");
-	        model.setViewName("registration");
+	        mailService.inviaMail(userDao.getEmail(), "Registrazione", "User registrato con successo");
+	        model.addObject("messaggio", "User registrato con successo");
+	        model.setViewName("login");
 			return model;
 	    }
 
@@ -95,12 +103,11 @@ public class AppController {
     	Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 	    User user = userService.findByEmail(auth.getName());   	    
 	    List<Activity> activities = user.getActivities();	    
-	    model.addObject("authUser", user.getEmail());
-	    model.addObject("authUserImage", Base64.getEncoder().encodeToString(user.getImage()));
-        model.addObject("activities", activities);
+	    model.addObject("emailUser", user.getEmail());
+	    model.addObject("imageUser", Base64.getEncoder().encodeToString(user.getImage()));
+        model.addObject("listaActivities", activities);
         model.addObject("activity", new Activity());
-        model.addObject("title", "Activities");  
-        model.setViewName("user/index");
+        model.setViewName("user/homepage");
         return model;
     }
     
@@ -130,13 +137,13 @@ public class AppController {
 			CronTrigger trigger = new CronTrigger(expression, TimeZone.getTimeZone(TimeZone.getDefault().getID()));
 			RunnableImpl runnable = new RunnableImpl(currActivity, mailService);
             scheduler.schedule(runnable, trigger);
-            redirectAttributes.addFlashAttribute("successmessage", "Activity is saved successfully");
+            redirectAttributes.addFlashAttribute("messaggio", "Activity aggiunta");
             model.setViewName("redirect:/user/home");
             return model;
         }else {
-            model.addObject("errormessage", "Activity is not save, Please try again");
+            model.addObject("messaggio", "Si è verificato un errore, riprova");
             model.addObject("activity", activity);
-            model.setViewName("user/index");
+            model.setViewName("user/homepage");
             return model;
         }
     }
