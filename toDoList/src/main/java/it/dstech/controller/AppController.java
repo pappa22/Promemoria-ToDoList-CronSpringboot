@@ -35,8 +35,6 @@ import it.dstech.service.UserRegistrationDao;
 import it.dstech.service.UserService;
 
 
-
-@EnableScheduling
 @Controller
 public class AppController {
 
