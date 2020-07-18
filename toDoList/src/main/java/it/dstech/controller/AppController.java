@@ -7,8 +7,11 @@ import java.util.List;
 import java.util.TimeZone;
 
 import javax.mail.MessagingException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -34,7 +37,7 @@ import it.dstech.service.MailService;
 import it.dstech.service.UserRegistrationDao;
 import it.dstech.service.UserService;
 
-
+@MultipartConfig
 @Controller
 public class AppController {
 
@@ -46,9 +49,11 @@ public class AppController {
 
 	@Autowired
 	private TaskScheduler scheduler;
-	
+
 	@Autowired
 	private MailService mailService;
+	
+	private Logger logger = LoggerFactory.getLogger(AppController.class);
 
 	@GetMapping(value = { "/login", "/" })
 	public ModelAndView login() {
@@ -56,69 +61,70 @@ public class AppController {
 		model.setViewName("login");
 		return model;
 	}
-	
-	 	@ModelAttribute("user")
-	    public UserRegistrationDao userRegistrationDto() {
-	        return new UserRegistrationDao();
-	    }
+
+//	@ModelAttribute("user")
+	public UserRegistrationDao userRegistrationDto() {
+		return new UserRegistrationDao();
+	}
 
 //	    @GetMapping
 //	    public String showRegistrationForm(Model model) {
 //	        return "registration";
 //	    }
-	    @GetMapping(value="/registrati")
-	    public ModelAndView registration(){
-	        ModelAndView modelAndView = new ModelAndView();
-	        User user = new User();
-	        modelAndView.addObject("user", user);
-	        modelAndView.setViewName("registration");
-	        return modelAndView;
-	    }
+	@GetMapping(value = "/registrati")
+	public ModelAndView registration() {
+		ModelAndView modelAndView = new ModelAndView();
+		modelAndView.addObject("user", userRegistrationDto());
+		modelAndView.setViewName("registration");
+		return modelAndView;
+	}
 
-	 	@PostMapping(value="/registration")
-	    public ModelAndView registerUserAccount(@ModelAttribute("user") @Valid UserRegistrationDao userDao, BindingResult result) throws MessagingException, IOException {
-	 		ModelAndView model = new ModelAndView();
-	 		User userEsistente = userService.findByEmail(userDao.getEmail());
-	        if (userEsistente != null) {
-	            result.rejectValue("email", null, "Utente già presente con questa email");
-	        }
+	@PostMapping(value = "/registration")
+	public ModelAndView registerUserAccount( @Valid UserRegistrationDao userDao,
+			BindingResult result) throws MessagingException, IOException {
+		ModelAndView model = new ModelAndView();
+		logger.info(String.format("userD %s", userDao.getEmail()));
+		User userEsistente = userService.findByEmail(userDao.getEmail());
+		if (userEsistente != null) {
+			result.rejectValue("email", null, "Utente già presente con questa email");
+		}
 
-	        if (result.hasErrors()) {
-	        	model.setViewName("error");
-	            return model;
-	        }
-
-	        userService.save(userDao);
-	        mailService.inviaMail(userDao.getEmail(), "Registrazione", "User registrato con successo");
-	        model.addObject("messaggio", "User registrato con successo");
-	        model.setViewName("login");
+		if (result.hasErrors()) {
+			model.setViewName("error");
 			return model;
-	    }
+		}
+
+		userService.save(userDao);
+		mailService.inviaMail(userDao.getEmail(), "Registrazione", "User registrato con successo");
+		model.addObject("messaggio", "User registrato con successo");
+		model.setViewName("login");
+		return model;
+	}
 
 	@GetMapping(value = "/user/home")
-    public ModelAndView userIndex(Activity activity) throws MessagingException {
+	public ModelAndView userIndex(Activity activity) throws MessagingException {
 		ModelAndView model = new ModelAndView();
-    	Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-	    User user = userService.findByEmail(auth.getName());   	    
-	    List<Activity> activities = user.getActivities();	    
-	    model.addObject("emailUser", user.getEmail());
-	    model.addObject("imageUser", Base64.getEncoder().encodeToString(user.getImage()));
-        model.addObject("listaActivities", activities);
-        model.addObject("activity", new Activity());
-        model.setViewName("user/homepage");
-        return model;
-    }
-    
-    @PostMapping(value="/save")
-    public ModelAndView save (@ModelAttribute Activity activity, RedirectAttributes redirectAttributes) {
-    	ModelAndView model = new ModelAndView();
-    	Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-	    User user = userService.findByEmail(auth.getName());   	
-	    activity.setUser(user);
-        Activity currActivity = activityService.save(activity);
-        userService.addActivities(user, currActivity);
-        if(currActivity != null) {
-            LocalDateTime date = currActivity.getExpiredDate();
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		User user = userService.findByEmail(auth.getName());
+		List<Activity> activities = user.getActivities();
+		model.addObject("emailUser", user.getEmail());
+		model.addObject("imageUser", Base64.getEncoder().encodeToString(user.getImage()));
+		model.addObject("listaActivities", activities);
+		model.addObject("activity", new Activity());
+		model.setViewName("user/homepage");
+		return model;
+	}
+
+	@PostMapping(value = "/save")
+	public ModelAndView save(@ModelAttribute Activity activity, RedirectAttributes redirectAttributes) {
+		ModelAndView model = new ModelAndView();
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		User user = userService.findByEmail(auth.getName());
+		activity.setUser(user);
+		Activity currActivity = activityService.save(activity);
+		userService.addActivities(user, currActivity);
+		if (currActivity != null) {
+			LocalDateTime date = currActivity.getExpiredDate();
 			int minute = date.getMinute();
 			int hours = date.getHour();
 			int day = date.getDayOfMonth();
@@ -126,7 +132,7 @@ public class AppController {
 			String expression = "";
 			if ((minute - 5) < 0) {
 				expression += " 0 " + (minute + 5) + " " + (hours - 1) + " " + day + " " + month + " ?";
-				if((hours - 1) < 0) {
+				if ((hours - 1) < 0) {
 					expression += " 0 " + (minute + 5) + " " + (hours + 23) + " " + day + " " + month + " ?";
 				}
 			} else {
@@ -134,15 +140,15 @@ public class AppController {
 			}
 			CronTrigger trigger = new CronTrigger(expression, TimeZone.getTimeZone(TimeZone.getDefault().getID()));
 			RunnableImpl runnable = new RunnableImpl(currActivity, mailService);
-            scheduler.schedule(runnable, trigger);
-            redirectAttributes.addFlashAttribute("messaggio", "Activity aggiunta");
-            model.setViewName("redirect:/user/home");
-            return model;
-        }else {
-            model.addObject("messaggio", "Si è verificato un errore, riprova");
-            model.addObject("activity", activity);
-            model.setViewName("user/homepage");
-            return model;
-        }
-    }
+			scheduler.schedule(runnable, trigger);
+			redirectAttributes.addFlashAttribute("messaggio", "Activity aggiunta");
+			model.setViewName("redirect:/user/home");
+			return model;
+		} else {
+			model.addObject("messaggio", "Si è verificato un errore, riprova");
+			model.addObject("activity", activity);
+			model.setViewName("user/homepage");
+			return model;
+		}
+	}
 }

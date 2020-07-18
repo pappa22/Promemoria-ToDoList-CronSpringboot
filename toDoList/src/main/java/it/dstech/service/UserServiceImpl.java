@@ -38,12 +38,12 @@ public class UserServiceImpl implements UserService {
 		user.setEmail(registration.getEmail());
 		user.setPassword(bCryptPasswordEncoder.encode(registration.getPassword()));
 		try {
-			user.setImage(registration.getImage().getBytes());
+			user.setImage(registration.getImageDAO().getBytes());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		Role userRole = roleRepo.findByRole("USER");
+		Role userRole = roleRepo.findByName("USER");
 		user.setRoles(new HashSet<Role>(Arrays.asList(userRole)));
 		return userRepository.save(user);
 	}

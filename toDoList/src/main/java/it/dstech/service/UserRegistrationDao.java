@@ -16,7 +16,7 @@ public class UserRegistrationDao {
     private String email;
     
     @Transient
-    private MultipartFile image;    
+    private MultipartFile imageDAO;    
 
     public String getPassword() {
         return password;
@@ -33,12 +33,12 @@ public class UserRegistrationDao {
     public void setEmail(String email) {
         this.email = email;
     }
-    
-	public MultipartFile getImage() {
-		return image;
+
+	public MultipartFile getImageDAO() {
+		return imageDAO;
 	}
-	
-	public void setImage(MultipartFile image) {
-		this.image = image;
+
+	public void setImageDAO(MultipartFile imageDAO) {
+		this.imageDAO = imageDAO;
 	}
 }
