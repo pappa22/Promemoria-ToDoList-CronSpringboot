@@ -14,18 +14,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
-import org.springframework.scheduling.annotation.EnableScheduling;
+
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+
+
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -62,10 +62,6 @@ public class AppController {
 		return model;
 	}
 
-//	@ModelAttribute("user")
-	public UserRegistrationDao userRegistrationDto() {
-		return new UserRegistrationDao();
-	}
 
 //	    @GetMapping
 //	    public String showRegistrationForm(Model model) {
@@ -74,16 +70,16 @@ public class AppController {
 	@GetMapping(value = "/registrati")
 	public ModelAndView registration() {
 		ModelAndView modelAndView = new ModelAndView();
-		modelAndView.addObject("user", userRegistrationDto());
+		modelAndView.addObject("user",new UserRegistrationDao());
 		modelAndView.setViewName("registration");
 		return modelAndView;
 	}
 
-	@PostMapping(value = "/registration")
-	public ModelAndView registerUserAccount( @Valid UserRegistrationDao userDao,
+	@PostMapping(value = "/salvaUser")
+	public ModelAndView registerUserAccount(@ModelAttribute("user") @Valid UserRegistrationDao userDao,
 			BindingResult result) throws MessagingException, IOException {
 		ModelAndView model = new ModelAndView();
-		logger.info(String.format("userD %s", userDao.getEmail()));
+		logger.info(String.format("////////////////////////userD %s", userDao.getEmail()));
 		User userEsistente = userService.findByEmail(userDao.getEmail());
 		if (userEsistente != null) {
 			result.rejectValue("email", null, "Utente già presente con questa email");
@@ -96,8 +92,9 @@ public class AppController {
 
 		userService.save(userDao);
 		mailService.inviaMail(userDao.getEmail(), "Registrazione", "User registrato con successo");
-		model.addObject("messaggio", "User registrato con successo");
-		model.setViewName("login");
+		model.addObject("messaggio", "User registrato con successo, loggati");
+		model.addObject("user", new UserRegistrationDao());
+		model.setViewName("registration");
 		return model;
 	}
 
