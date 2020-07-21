@@ -1,4 +1,4 @@
-REPLACE INTO `role` (`id`, `name`) VALUES ('1', 'USER');
+REPLACE INTO `promemoria`.`role` (`id`, `name`) VALUES (1, 'USER');
 
 
 

@@ -1,53 +1,77 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:th="http://www.thymeleaf.org">
-
+	xmlns:th="http://www.thymeleaf.org">
+<link rel="stylesheet"
+	href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+	integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+	crossorigin="anonymous">
 <head>
 <meta charset="ISO-8859-1">
 <title>User Homepage</title>
-  <link rel="stylesheet" type="text/css" th:href="@{/css/registration.css}"/>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<link rel="stylesheet" type="text/css"
+	th:href="@{/css/registration.css}" />
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script
+	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
 <body>
+	<form th:action="@{/logout}" method="get">
+		<button class="btn btn-md btn-info btn-block" name="logout"
+			type="Submit">Logout</button>
+	</form>
+	<div class="container">
+		<div class="row">
+			<h3 th:text="'Ciao, ' + ${emailUser} + '!'"></h3>
+			<div class="col-md-9">
+				<h3>Aggiungi Activity</h3>
 
-<div class="container">
-		<h2>Home page</h2>
-		<h1 th:text="'Ciao, ' + ${emailUser} + '!'">Welcome!</h1> Click here for <a th:href="@{/logout}">Logout</a>
-		<img class="rounded-circle" th:src="${imageUser} == null ? _ : @{'data:image/png;base64,'+${imageUser}}" style="width:100px;">
+				<form action="#" th:action="@{/save}" th:object="${activity}"
+					method="post">
+					<p th:if="${messaggio}">
+						<a href="#">&times;</a><strong class="text-success"
+							th:text="${messaggio}"></strong>
+					</p>
+					<input type="text" placeholder="Nome activity"
+						th:field="*{activityTitle}"> <input
+						placeholder="Tipo di activity" th:field="*{type}" type="text">
+					<input placeholder="Descrizione" th:field="*{description}"
+						type="text"> <input placeholder="Termine Activity"
+						th:field="*{date}" type="datetime-local"><input
+						type="hidden" th:field="*{id}"> <input type="submit"
+						value="Submit">
+				</form>
 
-		<h2>Activity Form</h2>
-
-		<form action="#" th:action="@{/save}" th:object="${activity}" method="post">
-			<p th:if="${messaggio}"><a href="#">&times;</a><strong class="text-success" th:text="${messaggio}"></strong></p>			
-			<input type="text" placeholder="Name activity" th:field="*{activityTitle}"> 
-			<input placeholder="Type of activity" th:field="*{type}" type="text">
-			<input placeholder="Description" th:field="*{description}" type="text"> 
-			<input placeholder="Expired date" th:field="*{date}" type="datetime-local"> <input type="hidden" th:field="*{id}"> 
-			<input type="submit" value="Submit">
-		</form>
-
-		<h2>Activity</h2>
-			<table class="activities">
-				<thead>
-					<tr>
-						<th>Titolo</th>
-						<th>Tipo di Attività</th>
-						<th>Descrizione</th>
-						<th>Scadenza</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr th:each="activity: ${listaActivities}">
-						<td th:text="${activity.activityTitle}"></td>
-						<td th:text="${activity.type}"></td>
-						<td th:text="${activity.description}"></td>
-						<td th:text="${#temporals.format(activity.expiredDate, 'yyyy-MM-dd HH:mm')}"></td>
-					</tr>
-				</tbody>
-			</table>
+				<h3>Lista Activity</h3>
+				<table class="table table-bordered table-dark">
+					<thead>
+						<tr>
+							<th>Titolo</th>
+							<th>Tipo</th>
+							<th>Descrizione</th>
+							<th>Scadenza</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="activity: ${listaActivities}">
+							<td th:text="${activity.activityTitle}"></td>
+							<td th:text="${activity.type}"></td>
+							<td th:text="${activity.description}"></td>
+							<td
+								th:text="${#temporals.format(activity.expiredDate, 'yyyy-MM-dd HH:mm')}"></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="col-md-3">
+				<span class="pull-right"><img class="rounded-circle"
+					th:src="${imageUser} == null ? _ : @{'data:image/png;base64,'+${imageUser}}"
+					style="width: 150px;"></span>
+			</div>
 		</div>
+	</div>
 
 </body>
 </html>

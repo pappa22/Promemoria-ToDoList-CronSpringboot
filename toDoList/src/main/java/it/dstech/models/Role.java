@@ -3,7 +3,6 @@ package it.dstech.models;
 import javax.persistence.*;
 
 @Entity
-
 public class Role {
 	
 		@Id

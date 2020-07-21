@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.TimeZone;
 
 import javax.mail.MessagingException;
-import javax.servlet.annotation.MultipartConfig;
-import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
