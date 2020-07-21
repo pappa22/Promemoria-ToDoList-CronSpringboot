@@ -5,7 +5,7 @@ import it.dstech.models.User;
 
 public interface UserService {
 
-    User findByEmail(String email);
+    User findUserByEmail(String email);
 
     User save(UserRegistrationDao registration);
     

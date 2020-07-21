@@ -28,7 +28,7 @@ public class UserServiceImpl implements UserService {
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
 
 	@Override
-	public User findByEmail(String email) {
+	public User findUserByEmail(String email) {
 		return userRepository.findByEmail(email);
 	}
 
@@ -38,6 +38,7 @@ public class UserServiceImpl implements UserService {
 		user.setEmail(registration.getEmail());
 		user.setPassword(bCryptPasswordEncoder.encode(registration.getPassword()));
 		try {
+			
 			user.setImage(registration.getImageDAO().getBytes());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

@@ -37,7 +37,7 @@ import it.dstech.service.MailService;
 import it.dstech.service.UserRegistrationDao;
 import it.dstech.service.UserService;
 
-@MultipartConfig
+
 @Controller
 public class AppController {
 
@@ -67,7 +67,7 @@ public class AppController {
 //	    public String showRegistrationForm(Model model) {
 //	        return "registration";
 //	    }
-	@GetMapping(value = "/registrati")
+	@GetMapping(value = "/registration")
 	public ModelAndView registration() {
 		ModelAndView modelAndView = new ModelAndView();
 		modelAndView.addObject("user",new UserRegistrationDao());
@@ -75,25 +75,22 @@ public class AppController {
 		return modelAndView;
 	}
 
-	@PostMapping(value = "/salvaUser")
+	@PostMapping(value = "/registration")
 	public ModelAndView registerUserAccount(@ModelAttribute("user") @Valid UserRegistrationDao userDao,
 			BindingResult result) throws MessagingException, IOException {
 		ModelAndView model = new ModelAndView();
 		logger.info(String.format("////////////////////////userD %s", userDao.getEmail()));
-		User userEsistente = userService.findByEmail(userDao.getEmail());
-		if (userEsistente != null) {
-			result.rejectValue("email", null, "Utente già presente con questa email");
-		}
-
-		if (result.hasErrors()) {
-			model.setViewName("error");
+		User userEsistente = userService.findUserByEmail(userDao.getEmail());
+		if (userEsistente == null) {
+			userService.save(userDao);
+			mailService.inviaMail(userDao.getEmail(), "Registrazione", "User registrato con successo");
+			model.addObject("messaggio", "User registrato con successo, loggati");
+			model.addObject("user", new UserRegistrationDao());
+			model.setViewName("registration");
 			return model;
 		}
-
-		userService.save(userDao);
-		mailService.inviaMail(userDao.getEmail(), "Registrazione", "User registrato con successo");
-		model.addObject("messaggio", "User registrato con successo, loggati");
-		model.addObject("user", new UserRegistrationDao());
+	
+		model.addObject("messaggio", "Utente già presente con questa email");
 		model.setViewName("registration");
 		return model;
 	}
@@ -102,7 +99,7 @@ public class AppController {
 	public ModelAndView userIndex(Activity activity) throws MessagingException {
 		ModelAndView model = new ModelAndView();
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		User user = userService.findByEmail(auth.getName());
+		User user = userService.findUserByEmail(auth.getName());
 		List<Activity> activities = user.getActivities();
 		model.addObject("emailUser", user.getEmail());
 		model.addObject("imageUser", Base64.getEncoder().encodeToString(user.getImage()));
@@ -116,7 +113,7 @@ public class AppController {
 	public ModelAndView save(@ModelAttribute Activity activity, RedirectAttributes redirectAttributes) {
 		ModelAndView model = new ModelAndView();
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		User user = userService.findByEmail(auth.getName());
+		User user = userService.findUserByEmail(auth.getName());
 		activity.setUser(user);
 		Activity currActivity = activityService.save(activity);
 		userService.addActivities(user, currActivity);

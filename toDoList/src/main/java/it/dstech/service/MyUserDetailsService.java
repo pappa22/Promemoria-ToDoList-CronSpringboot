@@ -26,7 +26,7 @@ public class MyUserDetailsService implements UserDetailsService {
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String email) {
-        User user = userService.findByEmail(email);
+        User user = userService.findUserByEmail(email);
         List<GrantedAuthority> authorities = getUserAuthority(user.getRoles());
         return buildUserForAuthentication(user, authorities);
     }
