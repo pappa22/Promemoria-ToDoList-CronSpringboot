@@ -76,7 +76,7 @@ public class AppController {
 	}
 
 	@PostMapping(value = "/registration")
-	public ModelAndView registerUserAccount(@ModelAttribute("user") @Valid UserRegistrationDao userDao,
+	public ModelAndView registerUserAccount(@ModelAttribute("user") UserRegistrationDao userDao,
 			BindingResult result) throws MessagingException, IOException {
 		ModelAndView model = new ModelAndView();
 		logger.info(String.format("////////////////////////userD %s", userDao.getEmail()));
