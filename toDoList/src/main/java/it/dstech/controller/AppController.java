@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
-
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -34,7 +33,6 @@ import it.dstech.service.ActivityService;
 import it.dstech.service.MailService;
 import it.dstech.service.UserRegistrationDao;
 import it.dstech.service.UserService;
-
 
 @Controller
 public class AppController {
@@ -50,7 +48,7 @@ public class AppController {
 
 	@Autowired
 	private MailService mailService;
-	
+
 	private Logger logger = LoggerFactory.getLogger(AppController.class);
 
 	@GetMapping(value = { "/login", "/" })
@@ -60,7 +58,6 @@ public class AppController {
 		return model;
 	}
 
-
 //	    @GetMapping
 //	    public String showRegistrationForm(Model model) {
 //	        return "registration";
@@ -68,14 +65,14 @@ public class AppController {
 	@GetMapping(value = "/registration")
 	public ModelAndView registration() {
 		ModelAndView modelAndView = new ModelAndView();
-		modelAndView.addObject("user",new UserRegistrationDao());
+		modelAndView.addObject("user", new UserRegistrationDao());
 		modelAndView.setViewName("registration");
 		return modelAndView;
 	}
 
 	@PostMapping(value = "/registration")
-	public ModelAndView registerUserAccount(@ModelAttribute("user") UserRegistrationDao userDao,
-			BindingResult result) throws MessagingException, IOException {
+	public ModelAndView registerUserAccount(@ModelAttribute("user") UserRegistrationDao userDao, BindingResult result)
+			throws MessagingException, IOException {
 		ModelAndView model = new ModelAndView();
 		logger.info(String.format("////////////////////////userD %s", userDao.getEmail()));
 		User userEsistente = userService.findUserByEmail(userDao.getEmail());
@@ -87,7 +84,7 @@ public class AppController {
 			model.setViewName("registration");
 			return model;
 		}
-	
+
 		model.addObject("messaggio", "Utente già presente con questa email");
 		model.setViewName("registration");
 		return model;
